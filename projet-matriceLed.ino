@@ -7,18 +7,11 @@
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAYVAL 500
 #include <SoftwareSerial.h>
-SoftwareSerial mySerial(7, 6); // RX, TX on a change le port RX et TX pour ne pas géner la communication série entre l'arduino et le module blth
+SoftwareSerial mySerial(3, 2); // RX, TX on a change le port RX et TX pour ne pas géner la communication série entre l'arduino et la matrice
 char data = 0;
 String s_data = "";
 String s_previousdata = "255/255/255/030/";
 bool etat;
-
-#include <Stepper.h>
-const int stepsPerRevolution = 32*64;
-Stepper myStepper(stepsPerRevolution, 9, 11, 10, 8); //moteur du bas
-Stepper myStepper2(stepsPerRevolution, 3, 5, 4, 2);
-
-
 void setup()
 {
   Serial.begin(38400);      
@@ -37,13 +30,12 @@ void loop()
    data = Serial.read();      // on initialise la variable data à l'information détecté par l'arduino
    if( data == '+')           // dès que le dernier caractères de la commande est détectée (le dernier caractère sera toujours un plus)
     {
-    Serial.print(s_data);
     etat = true;              // on active la recherche de type de data qui va faire tel ou                                                               
     }                         // tel action sur la matrice led
     else
     {
     s_data += String(data);   // tant qu'on a pas le dernier caractère on continue à ajouter les informations 
-    //Serial.print(s_data);     // dans data pour avoir la commande au complet      
+    Serial.print(s_data);     // dans data pour avoir la commande au complet      
     } 
   }   
                                                               
@@ -60,26 +52,6 @@ if (etat){
   s_data = "0/0/0/0";
   couleurLed();     
    }
-   
-   if(s_data == "avant"){
-    myStepper.setSpeed(13);
-    myStepper2.setSpeed(3);
-    for(int i=0; i<20; i++){
-      myStepper2.step(int(i/2)); // le deuxieme moteur fera 2 fois moins de pas
-      myStepper.step(i);
-    }
-
-   }
-
-      if(s_data == "arriere"){
-        myStepper.setSpeed(13);
-    myStepper2.setSpeed(3);
-     for(int i=0; i<20; i++){
-      myStepper2.step(-int(i/2));
-      myStepper.step(-i);
-    }
-   }
-   
    else
   {
    couleurLed(); 
